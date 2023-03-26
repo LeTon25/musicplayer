@@ -50,6 +50,4 @@ abstract class BaseSongAdapter(
         return songs.size
     }
 
-
-
     }

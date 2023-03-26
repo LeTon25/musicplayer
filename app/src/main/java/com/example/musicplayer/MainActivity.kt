@@ -8,14 +8,11 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.bumptech.glide.RequestManager
 import com.example.musicplayer.adapters.SwipeSongAdapter
-import com.example.musicplayer.common.Status
 import com.example.musicplayer.data.entities.Song
 import com.example.musicplayer.databinding.ActivityMainBinding
 import com.example.musicplayer.media.isPlaying
@@ -47,10 +44,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.vpSong.adapter = swipeSongAdapter
+        /*
         binding.vpSong.registerOnPageChangeCallback(object :OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 if (playbackStateCompat?.isPlaying == true){
+                    Log.d("theodoi1","Goi play")
                     mainViewModel.playOrToggleSong(swipeSongAdapter.songs[position])
                 }else{
                     curSong = swipeSongAdapter.songs[position]
@@ -58,15 +57,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+        */
         binding.ivPlayPause.setOnClickListener {
             curSong?.let{
+                Log.d("theodoi2","Goi play")
                 mainViewModel.playOrToggleSong(it,true)
             }
         }
+
         subscribeToObservers()
     }
-
-
     private fun hideBottomBar(){
         binding.vpSong.isVisible = false
         binding.ivPlayPause.isVisible = false
@@ -84,29 +84,18 @@ class MainActivity : AppCompatActivity() {
             curSong= song
         }
     }
+
     private fun subscribeToObservers(){
-        mainViewModel.listSong.observe(this){
-            it?.let {
-                when(it.status){
-                    Status.SUCCESS->{
-                        it.data?.let {
-                            songs ->
+        mainViewModel.currentPlaylist.observe(this){
+            it?.let { songs ->
                             swipeSongAdapter.songs = songs
                             if(songs.isNotEmpty()){
                                 glide.load(curSong ?:songs[0].thumbUrl).into(binding.ivCurSongImage)
                             }
                             switchViewPagerToCurrentSong(curSong ?: return@observe)
-                        }
-                    }
-                    Status.LOADING->{
-
-                    }
-                    Status.ERROR->{
-
-                    }
-                }
             }
         }
+
         mainViewModel.currentPlayingSong.observe(this){
             if (it == null) return@observe
             curSong = it.toSong()
@@ -114,13 +103,16 @@ class MainActivity : AppCompatActivity() {
             switchViewPagerToCurrentSong(curSong ?: return@observe)
 
         }
+
+
         mainViewModel.playbackState.observe(this){
             playbackStateCompat = it
             binding.ivPlayPause.setImageResource(
               if (playbackStateCompat?.isPlaying == true  )R.drawable.ic_pause else R.drawable.ic_play
             )
-
         }
+
+
         val navHost = supportFragmentManager.findFragmentById(R.id.navHostFragments)   as NavHostFragment
         navController = navHost.findNavController()
         swipeSongAdapter.setOnItemClickListener {
@@ -129,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                 )
 
         }
+
         navController.addOnDestinationChangedListener(object : NavController.OnDestinationChangedListener{
             override fun onDestinationChanged(
                 controller: NavController,
@@ -141,6 +134,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.playerFragment -> {
                         hideBottomBar()
+                    }
+                    R.id.homeFragment -> {
+                        showBottomBar()
                     }
                 }
             }

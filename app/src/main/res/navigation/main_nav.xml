@@ -3,14 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav"
-    app:startDestination="@id/listSongFragment">
+    app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/listSongFragment"
         android:name="com.example.musicplayer.ui.ListSong.ListSongFragment"
         android:label="ListSongFragment"
         tools:layout="@layout/fragment_list_song"
-        />
+        >
+        <action
+            android:id="@+id/action_listSongFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/playerFragment"
         android:name="com.example.musicplayer.ui.Player.PlayerFragment"
@@ -19,4 +23,16 @@
         />
     <action android:id="@+id/actionGoToPlayerFragment"
         app:destination="@+id/playerFragment"/>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.musicplayer.ui.Home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_listSongFragment"
+            app:destination="@id/listSongFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
 </navigation>

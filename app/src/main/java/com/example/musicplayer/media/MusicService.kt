@@ -8,13 +8,13 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.example.musicplayer.common.MEDIA_ALBUMS_ID
 import com.example.musicplayer.common.MEDIA_ROOT_ID
 import com.example.musicplayer.common.NETWORK_ERROR
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -40,7 +40,13 @@ class MusicService : MediaBrowserServiceCompat() {
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaSessionConnector: MediaSessionConnector
 
+    private var currentPlaylistItem : List<MediaMetadataCompat> = emptyList()
+
     lateinit var musicPlayerEventListener: MusicPlayerEventListener
+
+    private  val  browserTree: BrowserTree by lazy {
+        BrowserTree(musicSource)
+    }
 
     var isForegroundService = false
 
@@ -75,9 +81,10 @@ class MusicService : MediaBrowserServiceCompat() {
         }
 
         val musicPlaybackPreparer =MusicPlaybackPreparer(musicSource){
-            curPlayingSong = it
-            preparePlayer(musicSource.songs,
-                        it!!,
+            playList,songToPlay ->
+            curPlayingSong = songToPlay
+            preparePlayer(playList!!,
+                        songToPlay!!,
                     true
                 )
         }
@@ -96,13 +103,15 @@ class MusicService : MediaBrowserServiceCompat() {
                               playNow : Boolean
                               ){
          val curSongIndex = if(curPlayingSong == null) 0 else songs.indexOf(itemToPlay)
-        exoPlayer.prepare(musicSource.asMediaSource(dateSource))
+        currentPlaylistItem = songs
+        exoPlayer.prepare(musicSource.asMediaSource(currentPlaylistItem,dateSource))
         exoPlayer.seekTo(curSongIndex,0L)
         exoPlayer.playWhenReady =playNow
+
     }
     private inner class MusicQueueNavigator : TimelineQueueNavigator(mediaSession){
         override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
-            return musicSource.songs[windowIndex].description
+            return currentPlaylistItem[windowIndex].description
         }
 
     }
@@ -130,25 +139,25 @@ class MusicService : MediaBrowserServiceCompat() {
         parentId: String,
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
-        when(parentId){
-            MEDIA_ROOT_ID ->{
-                    val resultSent  = musicSource.whenReady { isInitialized ->
-                    if (isInitialized){
-                        result.sendResult(musicSource.asMediaItems())
-                        if (!isPlayerInitialized){
-                            preparePlayer(musicSource.songs,musicSource.songs[0],false)
-                            isPlayerInitialized = true
-                        }
-                    }else{
-                        mediaSession.sendSessionEvent(NETWORK_ERROR,null)
-                        result.sendResult(null)
-                    }
+        val resultSent  = musicSource.whenReady { isInitialized ->
+            if (isInitialized){
+                val children= browserTree.get(parentId)!!
 
-                    }
-                if (!resultSent){
-                    result.detach()
-                }
+             if (!parentId.equals(MEDIA_ALBUMS_ID)) {
+                 result.sendResult(musicSource.asMediaItems(children))
+                 if (!isPlayerInitialized) {
+                     isPlayerInitialized = true
+                 }
+             }else{
+                    result.sendResult(musicSource.asBrowserableMediaItems(children))
+             }
+            }else{
+                mediaSession.sendSessionEvent(NETWORK_ERROR,null)
+                result.sendResult(null)
             }
+        }
+        if (!resultSent){
+            result.detach()
         }
     }
 }

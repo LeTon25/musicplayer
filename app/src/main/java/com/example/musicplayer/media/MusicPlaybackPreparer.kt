@@ -10,7 +10,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 
 class MusicPlaybackPreparer(
     private val musicSource: MusicSource,
-    private val playerPrepared:(MediaMetadataCompat?)->Unit
+    private val playerPrepared:(List<MediaMetadataCompat>?,MediaMetadataCompat?)->Unit
 ) : MediaSessionConnector.PlaybackPreparer {
     override fun onCommand(
         player: Player,
@@ -26,6 +26,8 @@ class MusicPlaybackPreparer(
                    PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
     }
 
+
+
     override fun onPrepare(playWhenReady: Boolean) {
 
     }
@@ -34,17 +36,23 @@ class MusicPlaybackPreparer(
         musicSource.whenReady {
             val itemToPlay = musicSource.songs.find {
                 mediaId == it.description.mediaId
-
             }
-            playerPrepared(itemToPlay)
+           if (itemToPlay == null) {
+
+           }else{
+               playerPrepared(
+                   buildPlaylist(itemToPlay),
+                   itemToPlay)
+           }
         }
     }
 
     override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle?) {
-
     }
 
     override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle?) {
-
+    }
+    private fun buildPlaylist(mediaItem: MediaMetadataCompat) : List<MediaMetadataCompat>{
+        return musicSource.songs.filter { it.getString("AlbumId") == mediaItem.getString("AlbumId") }
     }
 }

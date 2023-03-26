@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@color/background"
+    android:layout_marginRight="12dp">
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        >
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/albumThumb"
+
+            android:scaleType="centerCrop"
+            android:src="@drawable/_9_"
+            app:shapeAppearance="@style/RoundedImage"
+            app:shapeAppearanceOverlay="@style/RoundedImage"
+
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textSize="16sp"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:textColor="@color/white"
+            android:id="@+id/albumName"
+            android:layout_gravity="center"
+            />
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>

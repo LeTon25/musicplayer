@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".MainActivity">
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:padding="5dp"
+            android:background="@color/background"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/vpSong"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/vpSong"
             >
         <fragment
             android:layout_width="match_parent"
@@ -22,11 +25,13 @@
 
             />
         </FrameLayout>
+
     <ImageView
         android:id="@+id/ivCurSongImage"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:scaleType="centerCrop"
+        android:src="@drawable/ic_loading"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -47,5 +52,4 @@
         android:src="@drawable/ic_play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

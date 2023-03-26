@@ -2,6 +2,7 @@ package com.example.musicplayer.ui.Player
 
 import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -49,6 +50,7 @@ class PlayerFragment : Fragment() {
         subscribeToObservers()
         binding.ivPlayPauseDetail.setOnClickListener {
             curSong?.let {
+                Log.d("theodoi5","Goi play")
                 mainViewModel.playOrToggleSong(it,true)
 
             }
@@ -83,10 +85,10 @@ class PlayerFragment : Fragment() {
     private fun updateTitleAndSongImage(song:Song){
         val title = "${song.songName} - ${song.songSinger}"
         binding.tvSongName.text = title
-           glide.load(song.thumbUrl).into(binding.ivSongImage)
+        glide.load(song.thumbUrl).into(binding.ivSongImage)
     }
     private fun subscribeToObservers(){
-        mainViewModel.listSong.observe(viewLifecycleOwner){
+        mainViewModel.singleSongs.observe(viewLifecycleOwner){
             data->
             when (data.status){
                 Status.SUCCESS ->{

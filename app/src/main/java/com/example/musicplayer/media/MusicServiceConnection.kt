@@ -2,7 +2,6 @@ package com.example.musicplayer.media
 
 import android.content.ComponentName
 import android.content.Context
-import android.media.browse.MediaBrowser
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -103,9 +102,9 @@ class MusicServiceConnection(
                              Resource.Error(null,"Không thể kết nối internet")
                          )
                      )
+
             }
         }
-
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             super.onPlaybackStateChanged(state)
             _playbackState.postValue(state)

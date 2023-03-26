@@ -3,6 +3,7 @@ package com.example.musicplayer.data.entities
 import android.support.v4.media.MediaMetadataCompat
 
 data class Song(
+    val albumID :String? = null,
     val audioUrl:String?= null,
     val songID:String? = null,
     val songName:String? = null,
@@ -20,5 +21,6 @@ fun Song.convertToMediaMetaDataCompat() : MediaMetadataCompat{
         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,this.thumbUrl)
         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE,this.songSinger)
         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION,this.songSinger)
+        .putString("AlbumId",if (this.albumID != null) this.albumID else "")
         .build()
 }
